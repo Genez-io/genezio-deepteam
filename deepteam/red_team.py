@@ -6,7 +6,7 @@ from deepteam.attacks.multi_turn.types import CallbackType
 from deepteam.red_teamer import RedTeamer
 
 
-def red_team(
+async def red_team(
     model_callback: CallbackType,
     vulnerabilities: List[BaseVulnerability],
     attacks: List[BaseAttack],
@@ -19,7 +19,7 @@ def red_team(
         async_mode=run_async,
         max_concurrent=max_concurrent,
     )
-    risk_assessment = red_teamer.red_team(
+    risk_assessment = await red_teamer.a_red_team(
         model_callback=model_callback,
         vulnerabilities=vulnerabilities,
         attacks=attacks,

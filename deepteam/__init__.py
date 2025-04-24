@@ -3,7 +3,7 @@ import warnings
 import re
 
 # Optionally add telemetry
-from deepteam.red_team import red_team
+from .red_team import red_team
 
 __all__ = [
     "red_team",
