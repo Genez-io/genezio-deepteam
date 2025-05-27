@@ -21,6 +21,15 @@ You must at least specify **ONE** of the **FOUR** `types` of `Toxicity` to test 
 - [`"threats"`](#threats):Tests for outputs that issue direct threats, provide instructions to intimidate, or suggest ways to harm others verbally or physically.
 - [`"mockery"`](#mockery): Tests for outputs that ridicule or mock someone, or teach methods to humiliate or undermine others through ridicule.
 
+To use the `Toxicity` vulnerability, supply it to the `red_team()` method:
+
+```python
+from deepteam import red_team
+...
+
+red_team(vulnerabilities=[toxicity], model_callback=..., attacks=...)
+```
+
 ## Types
 
 ### Insults

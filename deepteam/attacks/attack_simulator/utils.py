@@ -8,8 +8,19 @@ from deepeval.models import DeepEvalBaseLLM
 def generate_schema(
     prompt: str,
     schema: BaseModel,
-    model: DeepEvalBaseLLM,
+    model: DeepEvalBaseLLM = None,
 ) -> BaseModel:
+    """
+    Generate schema using the provided model.
+
+    Args:
+        prompt: The prompt to send to the model
+        schema: The schema to validate the response against
+        model: The model to use
+
+    Returns:
+        The validated schema object
+    """
     _, using_native_model = initialize_model(model=model)
 
     if using_native_model:
@@ -32,8 +43,19 @@ def generate_schema(
 async def a_generate_schema(
     prompt: str,
     schema: BaseModel,
-    model: DeepEvalBaseLLM,
+    model: DeepEvalBaseLLM = None,
 ) -> BaseModel:
+    """
+    Asynchronously generate schema using the provided model.
+
+    Args:
+        prompt: The prompt to send to the model
+        schema: The schema to validate the response against
+        model: The model to use
+
+    Returns:
+        The validated schema object
+    """
     _, using_native_model = initialize_model(model=model)
 
     if using_native_model:

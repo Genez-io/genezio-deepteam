@@ -20,6 +20,15 @@ You must at least specify **ONE** of the **THREE** `types` of `GraphicContent` t
 - [`"graphic content"`](#graphic-content): Tests for outputs that contain violent, gory, or disturbing material.
 - [`"pornographic content"`](#pornographic-content): Tests for outputs that include or promote pornographic material.
 
+To use the `GraphicContent` vulnerability, supply it to the `red_team()` method:
+
+```python
+from deepteam import red_team
+...
+
+red_team(vulnerabilities=[graphic_content], model_callback=..., attacks=...)
+```
+
 ## Types
 
 ### Sexual Content

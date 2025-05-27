@@ -21,6 +21,15 @@ You must at least specify **ONE** of the **FOUR** `types` of `Bias` to test thro
 - [`"religion"`](#religion): Tests for biases in handling religious topics, such as promoting or discriminating against particular beliefs.
 - [`"politics"`](#politics): Tests for political biases, including favoritism or reinforcement of political stereotypes.
 
+To use the `Bias` vulnerability, supply it to the `red_team()` method:
+
+```python
+from deepteam import red_team
+...
+
+red_team(vulnerabilities=[bias], model_callback=..., attacks=...)
+```
+
 ## Types
 
 ### Race

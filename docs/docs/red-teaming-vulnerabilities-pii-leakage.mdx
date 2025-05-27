@@ -27,6 +27,15 @@ You must at least specify **ONE** of the **FOUR** `types` of `PIILeakage` to tes
 - [`"session leak"`](#session-leak): Tests for outputs that disclose PII from other users' active or past sessions, such as inadvertently exposing personal details associated with session-based interactions.
 - [`"social manipulation"`](#social-manipulation): Tests for outputs that enable or facilitate social engineering attacks, tricking individuals into revealing their own or others' PII.
 
+To use the `PIILeakage` vulnerability, supply it to the `red_team()` method:
+
+```python
+from deepteam import red_team
+...
+
+red_team(vulnerabilities=[pii_leakage], model_callback=..., attacks=...)
+```
+
 ## Types
 
 ### Direct Disclosure

@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import Optional, List
+from typing import Dict, Optional, List
 import datetime
 import os
 import json
@@ -59,16 +59,17 @@ class VulnerabilityTypeResult(BaseModel):
 
 
 class AttackMethodResult(BaseModel):
-    attack_method: str
     pass_rate: float
     passing: int
     failing: int
     errored: int
+    attack_method: Optional[str] = None
 
 
 class RedTeamingOverview(BaseModel):
     vulnerability_type_results: List[VulnerabilityTypeResult]
     attack_method_results: List[AttackMethodResult]
+    errored: int
 
     def to_df(self):
         import pandas as pd
@@ -134,64 +135,78 @@ class RiskAssessment(BaseModel):
 
 
 def construct_risk_assessment_overview(
-    test_cases: List[RedTeamingTestCase],
+    red_teaming_test_cases: List[RedTeamingTestCase],
 ) -> RedTeamingOverview:
     # Group test cases by vulnerability type
-    vulnerability_type_to_cases = {}
-    for test_case in test_cases:
+    vulnerability_type_to_cases: Dict[
+        VulnerabilityType, List[RedTeamingTestCase]
+    ] = {}
+    attack_method_to_cases: Dict[str, List[RedTeamingTestCase]] = {}
+
+    errored = 0
+    for test_case in red_teaming_test_cases:
+        if not test_case.attack_method or test_case.error:
+            errored += 1
+            continue
+
+        # Group by vulnerability type
         if test_case.vulnerability_type not in vulnerability_type_to_cases:
             vulnerability_type_to_cases[test_case.vulnerability_type] = []
         vulnerability_type_to_cases[test_case.vulnerability_type].append(
             test_case
         )
 
-    # Calculate statistics for each vulnerability type
+        # Group by attack method
+        if test_case.attack_method not in attack_method_to_cases:
+            attack_method_to_cases[test_case.attack_method] = []
+        attack_method_to_cases[test_case.attack_method].append(test_case)
+
     vulnerability_type_results = []
     attack_method_results = []
 
+    # Stats per vulnerability type
     for vuln_type, test_cases in vulnerability_type_to_cases.items():
-        # Count passing, failing, and errored cases
         passing = sum(
-            1
-            for test_case in test_cases
-            if test_case.score is not None and test_case.score > 0
+            1 for tc in test_cases if tc.score is not None and tc.score > 0
         )
-        errored = sum(
-            1 for test_case in test_cases if test_case.error is not None
-        )
+        errored = sum(1 for tc in test_cases if tc.error is not None)
         failing = len(test_cases) - passing - errored
+        valid_cases = len(test_cases) - errored
+        pass_rate = (passing / valid_cases) if valid_cases > 0 else 0.0
 
-        # Calculate pass rate (excluding errored cases from the denominator)
-        valid_test_cases = len(test_cases) - errored
-        pass_rate = (
-            (passing / valid_test_cases) if valid_test_cases > 0 else 0.0
+        vulnerability_type_results.append(
+            VulnerabilityTypeResult(
+                vulnerability=test_cases[0].vulnerability if test_cases else "",
+                vulnerability_type=vuln_type,
+                pass_rate=pass_rate,
+                passing=passing,
+                failing=failing,
+                errored=errored,
+            )
         )
 
-        # Use the vulnerability name from the first case in this group
-        vulnerability_name = test_cases[0].vulnerability if test_cases else ""
-
-        # Create the result objects
-        vulnerability_type_result = VulnerabilityTypeResult(
-            vulnerability=vulnerability_name,
-            vulnerability_type=vuln_type,
-            pass_rate=pass_rate,
-            passing=passing,
-            failing=failing,
-            errored=errored,
+    # Stats per attack method
+    for attack_method, test_cases in attack_method_to_cases.items():
+        passing = sum(
+            1 for tc in test_cases if tc.score is not None and tc.score > 0
         )
-        attack_method_result = AttackMethodResult(
-            attack_method=test_case.attack_method,
-            pass_rate=pass_rate,
-            passing=passing,
-            failing=failing,
-            errored=errored,
+        errored = sum(1 for tc in test_cases if tc.error is not None)
+        failing = len(test_cases) - passing - errored
+        valid_cases = len(test_cases) - errored
+        pass_rate = (passing / valid_cases) if valid_cases > 0 else 0.0
+
+        attack_method_results.append(
+            AttackMethodResult(
+                attack_method=attack_method,
+                pass_rate=pass_rate,
+                passing=passing,
+                failing=failing,
+                errored=errored,
+            )
         )
 
-        vulnerability_type_results.append(vulnerability_type_result)
-        attack_method_results.append(attack_method_result)
-
-    # Create and return the final assessment
     return RedTeamingOverview(
         vulnerability_type_results=vulnerability_type_results,
         attack_method_results=attack_method_results,
+        errored=errored,
     )

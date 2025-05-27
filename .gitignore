@@ -163,6 +163,7 @@ node_modules
 .deepeval
 .deepeval-cache.json
 .deepeval_telemetry.txt
+.deepteam/
 .vector_db
 */cache
 

@@ -21,6 +21,15 @@ You must at least specify **ONE** of the **THREE** `types` of `Robustness` to te
 - [`"hijacking"`](#hijacking): Tests whether the output enables or complies with malicious or crafted inputs that redirect or alter the system’s intended behavior.
 - [`"input overreliance"`](#input-overreliance): Tests whether the output is excessively influenced by user input, leading to misleading and undesirable responses or behaviors that reflect user-provided content.
 
+To use the `Robustness` vulnerability, supply it to the `red_team()` method:
+
+```python
+from deepteam import red_team
+...
+
+red_team(vulnerabilities=[robustness], model_callback=..., attacks=...)
+```
+
 ## Types
 
 ### Hijacking

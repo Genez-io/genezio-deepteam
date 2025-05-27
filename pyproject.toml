@@ -1,37 +1,45 @@
-[tool.poetry]
+[project]
 name = "deepteam"
-version = "0.0.9"
+version = "0.1.4"
 description = "The LLM Red Teaming Framework"
-authors = ["Jeffrey Ip <jeffreyip@confident-ai.com>"]
+authors = [
+    { name = "Jeffrey Ip", email = "jeffreyip@confident-ai.com" },
+]
 license = "Apache-2.0"
 readme = "README.md"
-repository = "https://github.com/confident-ai/deepteam"
-documentation = "https://docs.trydeepteam.com"
+requires-python = ">=3.9,<3.14"
+dependencies = [
+    "aiohttp>=3.11.18",
+    "deepeval>=2.9.7",
+    "grpcio>=1.67.1",
+    "openai>=1.76.2",
+    "requests>=2.31.0",
+    "tabulate>=0.9.0",
+    "tqdm>=4.66.1",
+]
 
-[tool.poetry.scripts]
-deepteam = 'deepteam.cli.main:app'
+[project.urls]
+Repository = "https://github.com/confident-ai/deepteam"
+Documentation = "https://trydeepteam.com"
+Issues = "https://github.com/confident-ai/deepteam/issues"
 
-[tool.poetry.plugins."pytest11"]
-plugins = "deepteam.plugins.plugin"
-
-[tool.poetry.dependencies]
-deepeval="*"
-python = ">=3.9,<3.14"
-requests = "^2.31.0"
-tqdm = "^4.66.1"
-tabulate = "^0.9.0"
-black = "*"
-openai = "*"
-aiohttp = "*"
-twine="5.1.1"
-grpcio="1.67.1"
+[project.optional-dependencies]
+dev = [
+    "black>=25.1.0",
+    "pytest-asyncio>=0.24.0",
+    "pytest>=8.3.0",
+]
+build = [
+    "build>=1.0.3",
+    "twine>=6.1.0",
+]
 
 [tool.black]
 line-length = 80
 
 [build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
 [tool.pytest.ini_options]
 addopts = "-m 'not skip_test'"

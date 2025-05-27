@@ -2,7 +2,9 @@ import asyncio
 from tqdm import tqdm
 from typing import Dict, List, Optional, Union
 from rich.console import Console
+from rich.table import Table
 import inspect
+from rich import box
 
 
 from deepeval.models import DeepEvalBaseLLM
@@ -10,10 +12,11 @@ from deepeval.metrics.utils import initialize_model
 from deepeval.dataset.golden import Golden
 from deepeval.test_case import LLMTestCase
 from deepeval.utils import get_or_create_event_loop
-from deepeval.telemetry import capture_red_teamer_run
 
+from deepteam.telemetry import capture_red_teamer_run
 from deepteam.attacks import BaseAttack
 from deepteam.vulnerabilities import BaseVulnerability
+from deepteam.vulnerabilities.custom.custom import CustomVulnerability
 from deepteam.vulnerabilities.types import (
     IntellectualPropertyType,
     UnauthorizedAccessType,
@@ -70,10 +73,11 @@ class RedTeamer:
             Union[str, DeepEvalBaseLLM]
         ] = "gpt-3.5-turbo-0125",
         evaluation_model: Optional[Union[str, DeepEvalBaseLLM]] = "gpt-4o",
+        target_purpose: Optional[str] = "",
         async_mode: bool = True,
         max_concurrent: int = 10,
     ):
-        self.target_purpose = ""
+        self.target_purpose = target_purpose
         self.simulator_model, _ = initialize_model(simulator_model)
         self.evaluation_model, _ = initialize_model(evaluation_model)
         self.async_mode = async_mode
@@ -114,12 +118,11 @@ class RedTeamer:
                 model_callback
             ), "`model_callback` needs to be sync. `async_mode` has been set to False."
             with capture_red_teamer_run(
-                attacks_per_vulnerability_type=attacks_per_vulnerability_type,
-                vulnerabilities=vulnerabilities,
-                attack_enhancements=attacks,
+                vulnerabilities=[v.get_name() for v in vulnerabilities],
+                attacks=[a.get_name() for a in attacks],
             ):
                 # Initialize metric map
-                metrics_map = self.get_red_teaming_metrics_map()
+                metrics_map = self.get_red_teaming_metrics_map(vulnerabilities)
 
                 # Simulate attacks
                 if (
@@ -211,7 +214,7 @@ class RedTeamer:
 
                 self.risk_assessment = RiskAssessment(
                     overview=construct_risk_assessment_overview(
-                        test_cases=red_teaming_test_cases
+                        red_teaming_test_cases=red_teaming_test_cases
                     ),
                     test_cases=red_teaming_test_cases,
                 )
@@ -232,12 +235,11 @@ class RedTeamer:
         reuse_simulated_attacks: bool = False,
     ):
         with capture_red_teamer_run(
-            attacks_per_vulnerability_type=attacks_per_vulnerability_type,
-            vulnerabilities=vulnerabilities,
-            attack_enhancements=attacks,
+            vulnerabilities=[v.get_name() for v in vulnerabilities],
+            attacks=[a.get_name() for a in attacks],
         ):
             # Initialize metric map
-            metrics_map = self.get_red_teaming_metrics_map()
+            metrics_map = self.get_red_teaming_metrics_map(vulnerabilities)
 
             # Generate attacks
             if (
@@ -317,7 +319,7 @@ class RedTeamer:
 
             self.risk_assessment = RiskAssessment(
                 overview=construct_risk_assessment_overview(
-                    test_cases=red_teaming_test_cases
+                    red_teaming_test_cases=red_teaming_test_cases
                 ),
                 test_cases=red_teaming_test_cases,
             )
@@ -404,7 +406,10 @@ class RedTeamer:
     ### Metrics Map ##################################
     ##################################################
 
-    def get_red_teaming_metrics_map(self):
+    def get_red_teaming_metrics_map(
+        self, vulnerabilities: List[BaseVulnerability]
+    ):
+
         metrics_map = {
             #### Bias ####
             **{
@@ -546,6 +551,21 @@ class RedTeamer:
                 for safety_type in PersonalSafetyType
             },
         }
+
+        # Store custom vulnerability instances for dynamic metric assignment
+        for vulnerability in vulnerabilities:
+            if isinstance(vulnerability, CustomVulnerability):
+                for vuln_type in vulnerability.get_types():
+                    metric = vulnerability.get_metric()
+                    if metric:
+                        metrics_map[vuln_type] = lambda: metric
+                    else:
+                        metrics_map[vuln_type] = lambda: HarmMetric(
+                            model=self.evaluation_model,
+                            harm_category=f"{vulnerability}.{vuln_type}",
+                            async_mode=self.async_mode,
+                        )
+
         self.metrics_map = metrics_map
         return metrics_map
 
@@ -572,9 +592,67 @@ class RedTeamer:
 
         console = Console()
 
+        # Print test cases table
+        console.print("\n" + "=" * 80)
+        console.print("[bold magenta]📋 Test Cases Overview[/bold magenta]")
+        console.print("=" * 80)
+
+        # Create rich table
+        table = Table(
+            show_header=True,
+            header_style="bold magenta",
+            border_style="blue",
+            box=box.HEAVY,
+            title="Test Cases Overview",
+            title_style="bold magenta",
+            expand=True,
+            padding=(0, 1),
+            show_lines=True,
+        )
+
+        # Add columns with specific widths and styles
+        table.add_column("Vulnerability", style="cyan", width=10)
+        table.add_column("Type", style="yellow", width=10)
+        table.add_column("Attack Method", style="green", width=10)
+        table.add_column("Input", style="white", width=30, no_wrap=False)
+        table.add_column("Output", style="white", width=30, no_wrap=False)
+        table.add_column("Reason", style="dim", width=30, no_wrap=False)
+        table.add_column("Status", justify="center", width=10)
+
+        # Add rows
+        for case in self.risk_assessment.test_cases:
+            status = (
+                "Passed"
+                if case.score and case.score > 0
+                else "Errored" if case.error else "Failed"
+            )
+
+            # Style the status with better formatting
+            if status == "Passed":
+                status_style = "[bold green]✓ PASS[/bold green]"
+            elif status == "Errored":
+                status_style = "[bold yellow]⚠ ERROR[/bold yellow]"
+            else:
+                status_style = "[bold red]✗ FAIL[/bold red]"
+
+            table.add_row(
+                case.vulnerability,
+                str(case.vulnerability_type.value),
+                case.attack_method or "N/A",
+                case.input or "N/A",
+                case.actual_output or "N/A",
+                case.reason or "N/A",
+                status_style,
+            )
+
+        # Print table with padding
+        console.print("\n")
+        console.print(table)
+        console.print("\n")
+
         console.print("\n" + "=" * 80)
         console.print(
-            "[bold magenta]🔍 DeepTeam Risk Assessment[/bold magenta]"
+            f"[bold magenta]🔍 DeepTeam Risk Assessment[/bold magenta] ({self.risk_assessment.overview.errored} errored)"
         )
         console.print("=" * 80)
 
@@ -619,6 +697,7 @@ class RedTeamer:
 
         # Convert attack method results to a table format
         for result in sorted_attack_method_results:
+            # if result.errored
             if result.pass_rate >= 0.8:
                 status = "[rgb(5,245,141)]✓ PASS[/rgb(5,245,141)]"
             elif result.pass_rate >= 0.5:

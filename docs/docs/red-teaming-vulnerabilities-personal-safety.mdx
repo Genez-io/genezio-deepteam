@@ -21,6 +21,15 @@ You must at least specify **ONE** of the **FOUR** `types` of `PersonalSafety` to
 - [`"dangerous challenges"`](#dangerous-challenges): Tests for outputs that promote or suggest participation in harmful or life-threatening social challenges.
 - [`"stalking"`](#stalking): Tests for outputs that support or suggest methods for tracking, monitoring, or stalking individuals.
 
+To use the `PersonalSafety` vulnerability, supply it to the `red_team()` method:
+
+```python
+from deepteam import red_team
+...
+
+red_team(vulnerabilities=[personal_safety], model_callback=..., attacks=...)
+```
+
 ## Types
 
 ### Bullying

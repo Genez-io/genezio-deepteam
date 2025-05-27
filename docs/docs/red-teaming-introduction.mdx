@@ -44,9 +44,9 @@ Here's how you can implement it in code:
 ```python
 from deepteam import red_team
 from deepteam.vulnerabilities import Bias
-from deepteam.attacks import PromptInjection
+from deepteam.attacks.single_turn import PromptInjection
 
-def model_callback(input: str) -> str:
+async def model_callback(input: str) -> str:
     # Replace this with your LLM application
     return f"I'm sorry but I can't answer this: {input}"
 
@@ -140,7 +140,7 @@ The model callback in `deepteam` is simply a callback function that wraps around
 Here's how you can define your model callback:
 
 ```python
-def model_callback(input: str) -> str:
+async def model_callback(input: str) -> str:
     # Replace this with your LLM application
     return f"I'm sorry but I can't answer this: {input}"
 ```
@@ -387,7 +387,7 @@ from deepteam import red_team
 from deepteam.vulnerabilities import Bias
 from deepteam.attacks import PromptInjection
 
-def model_callback(input: str) -> str:
+async def model_callback(input: str) -> str:
     # Replace this with your LLM application
     return f"I'm sorry but I can't answer this: {input}"
 
@@ -397,15 +397,16 @@ prompt_injection = PromptInjection()
 risk_assessment = red_team(model_callback=model_callback, vulnerabilities=[bias], attacks=[prompt_injection])
 ```
 
-There are **THREE** mandatory and **FOUR** optional arguments when calling the `red_team()` function:
+There are **THREE** mandatory and **FIVE** optional arguments when calling the `red_team()` function:
 
 - `model_callback`: a callback of type `Callable[[str], str]` that wraps around the target LLM system you wish to red team.
 - `vulnerabilities`: a list of type `BaseVulnerability`s that determines the weaknesses to detect for.
 - `attacks`: a list of type `BaseAttack`s that determines the methods that will be simulated to expose the defined `vulnerabilities`.
 - [Optional] `attacks_per_vulnerability_type`: an int that determines the number of attacks to be simulated per vulnerability type. Defaulted to `1`.
 - [Optional] `ignore_errors`: a boolean which when set to `True`, ignores all exceptions raised during red teaming. Defaulted to `False`.
-- [Optional] `run_async`: a boolean which when set to `True`, enables concurrent red teaming on all vulnerabilities, attacks, generations, **AND** evaluations. Defaulted to `False`.
+- [Optional] `run_async`: a boolean which when set to `True`, enables concurrent red teaming on all vulnerabilities, attacks, generations, **AND** evaluations. Defaulted to `True`.
 - [Optional] `max_concurrent`: an integer that determines the maximum number of coroutines that can be ran in parallel. You can decrease this value if your models are running into rate limit errors. Defaulted to `10`.
+- [Optional] `target_purpose`: a string specifying your target LLM application's intended purpose. This affects the passing and failing of simulated attacks that are evaluated. Defaulted to `None`.
 
 Don't forget to save the results (or at least print it):
 
@@ -435,8 +436,9 @@ from deepteam.red_teaming import RedTeamer
 red_teamer = RedTeamer()
 ```
 
-There are **THREE** optional parameters when creating a `RedTeamer`:
+There are **FIVE** optional parameters when creating a `RedTeamer`:
 
+- [Optional] `target_purpose`: a string specifying your target LLM application's intended purpose. This affects the passing and failing of simulated attacks that are evaluated. Defaulted to `None`.
 - [Optional] `simulator_model`: a string specifying which of OpenAI's GPT models to use, **OR** [any custom LLM model](https://docs.confident-ai.comhttps://docs.confident-ai.com/guides/guides-using-custom-llms) of type `DeepEvalBaseLLM` for simulating attacks. Defaulted to `"gpt-3.5-turbo-0125"`.
 - [Optional] `evaluation_model`: a string specifying which of OpenAI's GPT models to use, **OR** [any custom LLM model](https://docs.confident-ai.comhttps://docs.confident-ai.com/guides/guides-using-custom-llms) of type `DeepEvalBaseLLM` for evaluation. Defaulted to `"gpt-4o"`.
 - [Optional] `async_mode`: a boolean specifying whether to enable async mode. Defaulted to `True`.
@@ -457,7 +459,7 @@ from deepteam.vulnerabilities import Bias
 from deepteam.attacks.single_turn import PromptInjection, ROT13
 from deepteam.red_teamer import RedTeamer
 
-def model_callback(input: str) -> str:
+async def model_callback(input: str) -> str:
     # Replace this with your LLM application
     return f"I'm sorry but I can't answer this: {input}"
 

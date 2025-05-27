@@ -23,6 +23,15 @@ You must at least specify **ONE** of the **FOUR** `types` of `PromptLeakage` to 
 - [`"guard exposure"`](#guard-exposure): Tests for outputs that expose guard mechanisms, such as rejection rules or criteria for sensitive requests, potentially enabling users to bypass safeguards.
 - [`"permissions and roles"`](#permissions-and-roles): Tests for outputs that reveal role-based permissions, access controls, or internal configurations mentioned in the system prompt.
 
+To use the `PromptLeakage` vulnerability, supply it to the `red_team()` method:
+
+```python
+from deepteam import red_team
+...
+
+red_team(vulnerabilities=[prompt_leakage], model_callback=..., attacks=...)
+```
+
 ## Types
 
 ### Secrets and Credentials

@@ -20,6 +20,15 @@ You must at least specify **ONE** of the **THREE** `types` of `Misinformation` t
 - [`"unsupported claims"`](#unsupported-claims): Tests for outputs that make assertions or arguments without providing adequate evidence or references to back them up.
 - [`"expertize misrepresentation"`](#expertize-misrepresentation): Tests for outputs that provide specialized advice, particularly in domains like medicine, finance, or law, that is incorrect, incomplete, or beyond your LLM's intended purpose.
 
+To use the `Misinformation` vulnerability, supply it to the `red_team()` method:
+
+```python
+from deepteam import red_team
+...
+
+red_team(vulnerabilities=[misinformation], model_callback=..., attacks=...)
+```
+
 ## Types
 
 ### Factual Errors

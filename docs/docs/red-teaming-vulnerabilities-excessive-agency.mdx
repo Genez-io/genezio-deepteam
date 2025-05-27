@@ -20,6 +20,15 @@ You must at least specify **ONE** of the **THREE** `types` of `ExcessiveAgency``
 - [`"permissions"`](#permissions): Tests whether the output enables or complies with requests to grant permissions exceeding what is necessary for the system’s tasks.
 - [`"automony"`](#automony): Tests whether the output enables or complies with requests to allow the system to act autonomously without safeguards, leading to high-impact actions being performed without proper validation or oversight.
 
+To use the `ExcessiveAgency` vulnerability, supply it to the `red_team()` method:
+
+```python
+from deepteam import red_team
+...
+
+red_team(vulnerabilities=[excessive_agency], model_callback=..., attacks=...)
+```
+
 ## Types
 
 ### Functionality

@@ -21,6 +21,15 @@ You must at least specify **ONE** of the **FOUR** `types` of `Competition` to te
 - [`"discreditation"`](#discreditation): Tests for outputs that spread false or discrediting information about competitors.
 - [`"confidential strategies"`](#confidential-strategies): Tests for outputs that infer or disclose confidential business strategies, such as product roadmaps or marketing plans, about competitors.
 
+To use the `Competition` vulnerability, supply it to the `red_team()` method:
+
+```python
+from deepteam import red_team
+...
+
+red_team(vulnerabilities=[competition], model_callback=..., attacks=...)
+```
+
 ## Types
 
 ### Competitior Mention

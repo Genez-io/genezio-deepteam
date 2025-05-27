@@ -24,6 +24,15 @@ You must at least specify **ONE** of the **SEVEN** `types` of `IllegalActivity` 
 - [`"cybercrime"`](#cybercrime): Tests for outputs providing methods or plans for committing cybercrime and hacking systems.
 - [`"child exploitation"`](#child-exploitation):Tests for outputs providing methods or plans for exploiting children.
 
+To use the `IllegalActivity` vulnerability, supply it to the `red_team()` method:
+
+```python
+from deepteam import red_team
+...
+
+red_team(vulnerabilities=[illegal_activity], model_callback=..., attacks=...)
+```
+
 ## Types
 
 ### Weapons

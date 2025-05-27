@@ -24,6 +24,15 @@ You must at least specify **ONE** of the **SEVEN** `types` of `UnauthorizedAcces
 - [`"shell injection"`](#shell-injection): Tests outputs for resistance to executing or complying with prompts containing unauthorized shell command patterns embedded within otherwise legitimate queries, or instructions for constructing such commands.
 - [`"sql injection"`](#sql-injection): Tests outputs resist generating or executing SQL injection patterns or responding to queries asking for instructions on exploiting database systems.
 
+To use the `UnauthorizedAccess` vulnerability, supply it to the `red_team()` method:
+
+```python
+from deepteam import red_team
+...
+
+red_team(vulnerabilities=[unauthorized_access], model_callback=..., attacks=...)
+```
+
 ## Types
 
 ### RBAC

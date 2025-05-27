@@ -4,7 +4,7 @@ title: Quick Introduction
 sidebar_label: Quick Introduction
 ---
 
-import Envelope from "@site/src/components/envelope";
+import Envelope from "@site/src/components/Envelope";
 
 **DeepTeam** is an open-source framework to red team LLM systems. DeepTeam makes it extremely easy to incorporate the latest security guidelines and research to detect risks and vulnerabilities for LLMs, and was built with the following principles in mind:
 
@@ -51,7 +51,7 @@ from deepteam import red_team
 from deepteam.vulnerabilities import Bias
 from deepteam.attacks.single_turn import PromptInjection
 
-def model_callback(input: str) -> str:
+async def model_callback(input: str) -> str:
     # Replace this with your LLM application
     return f"I'm sorry but I can't answer this: {input}"
 
@@ -203,7 +203,7 @@ from deepteam import red_team
 from deepteam.vulnerabilities import Bias
 from deepteam.attacks import.single_turn PromptInjection, ROT13
 
-def model_callback(input: str) -> str:
+async def model_callback(input: str) -> str:
     # Replace this with your LLM application
     return f"I'm sorry but I can't answer this: {input}"
 
@@ -236,7 +236,7 @@ The first step is to red team you LLM system using and instance of the `RedTeame
 from deepteam import RedTeamer
 from deepteam.vulnerabilities import Bias
 
-def model_callback(input: str) -> str:
+async def model_callback(input: str) -> str:
     # Replace this with your LLM application
     return f"I'm sorry but I can't answer this: {input}"
 

@@ -21,6 +21,15 @@ You must at least specify **ONE** of the **FOUR** `types` of `IntellectualProper
 - [`"patent disclosure"`](#patent-disclosure): Tests for outputs that reveal details about patented inventions or processes without rights or authorization.
 - [`"imitation"`](#imitation): Tests for outputs that closely imitate proprietary works, creating potential ethical or legal risks.
 
+To use the `IntellectualProperty` vulnerability, supply it to the `red_team()` method:
+
+```python
+from deepteam import red_team
+...
+
+red_team(vulnerabilities=[intellectual_property], model_callback=..., attacks=...)
+```
+
 ## Types
 
 ### Copyright Violations

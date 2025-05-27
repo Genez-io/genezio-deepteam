@@ -8,7 +8,7 @@
 }
 
 :root {
-  --ifm-color-primary: #f60459;
+  --ifm-color-primary: #ff0062;
   --ifm-color-primary-dark: #f6174f;
   --ifm-color-primary-darker: #f50a45;
   --ifm-color-primary-darkest: #c90839;
@@ -16,7 +16,11 @@
   --ifm-color-primary-lighter: #f95f86;
   --ifm-color-primary-lightest: #fa8aa6;
   --ifm-code-font-size: 95%;
+  --ifm-font-weight-bold: 600 !important;
+  --ifm-menu-color: #747480 !important;
   --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+  --ifm-blockquote-border-left-width: 4px;
+  --ifm-blockquote-border-color: var(--ifm-color-primary);
 
   .alert--success {
     --ifm-alert-background-color: #effffb !important;
@@ -31,7 +35,7 @@
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
 html[data-theme="dark"] {
-  --ifm-color-primary: #f73465;
+  --ifm-color-primary: #f3154c;
   --ifm-color-primary-dark: #f6174f;
   --ifm-color-primary-darker: #f50a45;
   --ifm-color-primary-darkest: #ff1c55;
@@ -75,6 +79,41 @@ html[data-theme="light"] .navbar {
   background-color: white;
 }
 
+
+.menu {
+  font-weight: 400;
+  background-image: radial-gradient(rgba(0, 0, 0, 0.131) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+html[data-theme="dark"] .menu {
+  background-image: radial-gradient(rgba(30, 29, 32, 0.131) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.menu__link {
+  font-size: 16px;
+  padding-top: 0.4rem !important;
+  padding-bottom: 0.4rem !important;
+}
+
+.menu__link--active {
+  font-weight: 400 !important;
+  // background-color: white !important;
+  // border: 1px solid #710bee;
+  // border-right: 1px solid #e0e0e0;
+  // border-top-right-radius: 0;
+  // border-bottom-right-radius: 0;
+  // box-sizing: border-box;
+}
+
+.menu__link--sublist-caret:after{
+  width: 0.8rem;
+  height: 0.8rem;
+  min-width: 0.8rem;
+  background: var(--ifm-menu-link-sublist-icon) 50% / 1.7rem 1.7rem;
+}
+
 .navbar__logo {
   height: 2.2rem;
 }
@@ -88,7 +127,7 @@ div[class^="announcementBar_"] {
 }
 
 html[data-theme="light"] div[class^="announcementBar_"] {
-  background-color: #f60459 !important;
+  background-color: #ff2974 !important;
   color: white !important;
 }
 
@@ -128,6 +167,17 @@ html[data-theme="dark"] .header-github-link:before {
 
 .footer__bottom {
   margin: 40px auto 10px auto;
+}
+
+blockquote {
+  font-size: 20px;
+  font-style: italic;
+  color: black;
+  padding: 0.5rem 1rem;
+}
+
+html[data-theme="dark"] blockquote {
+  color: rgb(205, 205, 205);
 }
 
 html[data-theme="dark"] .header-confident-link {
@@ -257,18 +307,29 @@ img, video {
   border-radius: 6px;
 }
 
-.glowing {
-  animation: glow 2s infinite alternate;
+/* Adjust borders for subcategories */
+.sidebar-item-getting-started  ul,
+.sidebar-item-icon-red-teaming  ul,
+.sidebar-item-icon-guidelines-frameworks  ul,
+.sidebar-item-icon-others ul {
+  margin-left: 20px !important;
+  border-left: 1px solid #e0e0e0;
 }
 
-@keyframes glow {
-  0% {
-    filter: drop-shadow(0 0 5px #c4b5fd);
-  }
-  30% {
-    filter: drop-shadow(0 0 15px #7c3aed);
-  }
-  100% {
-    filter: drop-shadow(0 0 25px #6d28d9);
-  }
+html[data-theme='dark'] .sidebar-item-getting-started > ul,
+html[data-theme='dark'] .sidebar-item-icon-red-teaming > ul,
+html[data-theme='dark'] .sidebar-item-icon-guidelines-frameworks > ul,
+html[data-theme='dark'] .sidebar-item-icon-others > ul {
+  border-left-color: #383f4b;
+}
+
+/* Styling for Lucide icons in sidebar */
+.sidebar-icon {
+  margin-right: 0.5rem;
+  width: 1em;
+  height: 1em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
 }

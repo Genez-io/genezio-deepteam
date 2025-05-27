@@ -12,3 +12,4 @@ from .intellectual_property.intellectual_property import IntellectualProperty
 from .competition.competition import Competition
 from .graphic_content.graphic_content import GraphicContent
 from .personal_safety.personal_safety import PersonalSafety
+from .custom.custom import CustomVulnerability
