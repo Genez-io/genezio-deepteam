@@ -3,7 +3,7 @@ from typing import List, Optional
 from deepteam.vulnerabilities import BaseVulnerability
 from deepteam.attacks import BaseAttack
 from deepteam.attacks.multi_turn.types import CallbackType
-from deepteam.red_teamer import RedTeamer
+from .red_teamer import RedTeamer
 
 
 async def red_team(
